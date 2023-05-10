@@ -75,29 +75,65 @@
         }
     </style>
     <script>
-        getAllStats();
+        var currentSortColumn = null;
+        var currentSortOrder = 'asc';
+
+        function sortTable(column) {
+            var table = $("#stats-table");
+            var rows = table.find('tbody tr').toArray();
+
+            var sortOrder = (currentSortColumn === column && currentSortOrder === 'asc') ? 'desc' : 'asc';
+
+            rows.sort(function(a, b) {
+                var rowDataA = $(a).find('td[data-column="' + column + '"]').text().trim();
+                var rowDataB = $(b).find('td[data-column="' + column + '"]').text().trim();
+
+                if (column === "event_date") {
+                    return new Date(rowDataA) - new Date(rowDataB);
+                } else {
+                    return rowDataA.localeCompare(rowDataB, 'en', { numeric: true });
+                }
+            });
+
+            if (sortOrder === 'desc') {
+                rows.reverse();
+            }
+
+            currentSortColumn = column;
+            currentSortOrder = sortOrder;
+
+            table.find('tbody').empty().append(rows);
+        }
+
+        $(document).on('click', '#stats-table th.sortable', function() {
+            var column = $(this).attr('data-column');
+            sortTable(column);
+        });
 
         function getAllStats() {
-                $.ajax({
-                    url: "getevent.php",
-                    method: "GET",
-                    data: {
-                        all_stats: true
-                    },
-                    dataType: "json",
-                    success: function (data) {
-                        console.log(2222, data);
-                        $("#stats-table tbody").empty();
-                        for (var i = 0; i < data.length; i++) {
-                            var row = "<tr><td>" + data[i].id + "</td><td>" + data[i].event_name + "</td><td>" + data[i].user_status + "</td><td>" + data[i].user_ip  + "</td><td>" + data[i].event_date + "</td></tr>";
-                            $("#stats-table tbody").append(row);
-                        }
-                    },
-                    error: function () {
-                        alert("An error occurred while processing your request.");
+            $.ajax({
+                url: "getevent.php",
+                method: "GET",
+                data: {
+                    all_stats: true
+                },
+                dataType: "json",
+                success: function (data) {
+                    console.log(2222, data);
+                    $("#stats-table tbody").empty();
+
+                    for (var i = 0; i < data.length; i++) {
+                        var row = "<tr><td data-column='id'>" + data[i].id + "</td><td data-column='event_name'>" + data[i].event_name + "</td><td data-column='user_status'>" + data[i].user_status + "</td><td data-column='user_ip'>" + data[i].user_ip  + "</td><td data-column='event_date'>" + data[i].event_date + "</td></tr>";
+                        $("#stats-table tbody").append(row);
                     }
-                });
-            }
+                },
+                error: function () {
+                    alert("An error occurred while processing your request.");
+                }
+            });
+        }
+
+        getAllStats();
 
         $(document).ready(function () {
             
@@ -267,16 +303,15 @@
         <table id="stats-table">
             <thead>
                 <tr>
-                    <th>Id</th>
-                    <th>Event name</th>
-                    <th>User status</th>
-                    <th>User ip</th>
-                    <th>Event date</th>
+                    <th class="sortable" data-column="id">Id</th>
+                    <th class="sortable" data-column="event_name">Event name</th>
+                    <th class="sortable" data-column="user_status">User status</th>
+                    <th class="sortable" data-column="user_ip">User ip</th>
+                    <th class="sortable" data-column="event_date">Event date</th>
                 </tr>
             </thead>
             <tbody></tbody>
         </table>
-        <!-- <button id="btn-get-all-stats">Get All Stats</button> -->
     </div>
 </body>
 </html>

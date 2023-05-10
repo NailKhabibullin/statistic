@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Статистика</title>
+    <style>
+      body {
+        background-color: #F2F3F5;
+        font-family: Arial, sans-serif;
+      }
+
+      h1 {
+        font-size: 36px;
+        font-weight: bold;
+        color: #4B4F56;
+        text-align: center;
+        margin-top: 50px;
+      }
+
+      button {
+        display: block;
+        margin: 30px auto;
+        padding: 15px 20px;
+        font-size: 18px;
+        font-weight: bold;
+        color: #FFFFFF;
+        background-color: #5181B8;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+
+      button:hover {
+        background-color: #5F9BEA;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Получи статистику!</h1>
+    <button onclick="goToGetForm()">Получить данные</button>
+    <script>
+      function goToGetForm() {
+        window.location.href = "http://localhost/vk_test/getevent.html";
+      }
+    </script>
+    <button onclick="goToPostForm()">Передать данные</button>
+    <script>
+      function goToPostForm() {
+        window.location.href = "http://localhost/vk_test/saveevent.html";
+      }
+    </script>
+  </body>
+</html>

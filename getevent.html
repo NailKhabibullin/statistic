@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Statistics Page</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+    <style>
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background-color: #e9eaed;
+            color: #1d2129;
+            font-size: 16px;
+        }
+        h1, h2 {
+            margin: 0;
+            font-weight: 500;
+            font-size: 24px;
+        }
+        button {
+            border: none;
+            background-color: #5181b8;
+            color: #fff;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #3d6ca4;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-top: 30px;
+        }
+        form label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            font-size: 18px;
+        }
+        form input[type="text"], form input[type="datetime-local"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #dfe1e5;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+        table {
+            width: 100%;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-top: 30px;
+            border-collapse: collapse;
+        }
+        table th, table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #dfe1e5;
+        }
+        table th {
+            font-weight: 500;
+            font-size: 18px;
+        }
+    </style>
+    <script>
+        $(document).ready(function () {
+            $("form").submit(function (event) {
+                event.preventDefault();
+                var eventName = $("#event-name").val();
+                var dateFrom = new Date($("#date-from").val()).toISOString().slice(0,10);
+                var dateTo = new Date($("#date-to").val()).toISOString().slice(0,10);
+                $.ajax({
+                    url: "getevent.php",
+                    method: "GET",
+                    data: {
+                        event_name: eventName,
+                        date_from: dateFrom,
+                        date_to: dateTo
+                    },
+                    dataType: "json",
+                    success: function (data) {
+                        console.log(1112, data[0])
+                        $("#event-table tbody").empty();
+                        $.each(data[0].events, function (i, item) {
+                            var row = "<tr><td>" + item.event + "</td><td>" + item.count + "</td></tr>";
+                            $("#event-table tbody").append(row);
+                        });
+                        $("#ip-table tbody").empty();
+                        $.each(data[0].ips, function (i, item) {
+                            var row = "<tr><td>" + item.ip + "</td><td>" + item.count + "</td></tr>";
+                            $("#ip-table tbody").append(row);
+                        });
+                        $("#status-table tbody").empty();
+                        $.each(data[0].statuses, function (i, item) {
+                            var row = "<tr><td>" + item.status + "</td><td>" + item.count + "</td></tr>";
+                            $("#status-table tbody").append(row);
+                        });
+                    },
+                    error: function () {
+                        alert("An error occurred while processing your request.");
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <div style="background-color: #5181b8; color: #fff; padding: 20px;">
+    <button onclick="goToIndex()">Главная</button>
+    <script>
+      function goToIndex() {
+        window.location.href = "http://localhost/vk_test/index.html";
+      }
+    </script>
+    <h1>Statistics Page</h1>
+    <form>
+        <label for="event-name">Event Name:</label>
+        <input type="text" id="event-name" name="event_name">
+        <br>
+        <label for="date-from">Date From:</label>
+        <input type="datetime-local" id="date-from" name="date_from">
+        <br>
+        <label for="date-to">Date To:</label>
+        <input type="datetime-local" id="date-to" name="date_to">
+        <br>
+        <button type="submit">Get Statistics</button>
+    </form>
+    <h2>Event Statistics</h2>
+    <table id="event-table">
+        <thead>
+        <tr>
+            <th>Event Name</th>
+            <th>Count</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <h2>IP Statistics</h2>
+    <table id="ip-table">
+        <thead>
+        <tr>
+            <th>IP Address</th>
+            <th>Count</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <h2>Status Statistics</h2>
+    <table id="status-table">
+        <thead>
+        <tr>
+            <th>User Status</th>
+            <th>Count</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <button onclick="goToSaveEvent()">Перейти на старницу ввода данных</button>
+    <script>
+      function goToSaveEvent() {
+        window.location.href = "http://localhost/vk_test/saveevent.html";
+      }
+    </script>
+    </div>
+</body>
+</html>

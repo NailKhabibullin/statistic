@@ -13,16 +13,18 @@
             font-size: 16px;
         }
         h1, h2 {
-            margin: 0;
-            font-weight: 500;
-            font-size: 24px;
+            margin: 10px;
+            font-size: 36px;
+            font-weight: bold;
+            text-align: center;
         }
         button {
             border: none;
             background-color: #5181b8;
             color: #fff;
             padding: 10px 20px;
-            font-size: 16px;
+            font-size: 18px;
+            font-weight: bold;
             border-radius: 4px;
             cursor: pointer;
         }
@@ -39,10 +41,11 @@
         form label {
             display: block;
             margin-bottom: 10px;
-            font-weight: 500;
             font-size: 18px;
+            font-weight: bold;
+            color: #4B4F56;
         }
-        form input[type="text"], form input[type="datetime-local"] {
+        form input[type="date"] {
             width: 100%;
             padding: 10px;
             font-size: 16px;
@@ -59,6 +62,7 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             margin-top: 30px;
             border-collapse: collapse;
+            color:#1d2129
         }
         table th, table td {
             padding: 10px;
@@ -72,9 +76,22 @@
     </style>
     <script>
         $(document).ready(function () {
+            $("#group-by").change(function () {
+            var selectedValue = $(this).val();
+            $("#event-options, #status-options, #ip-options").hide();
+
+            if (selectedValue === "event") {
+                $("#event-options").show();
+            } else if (selectedValue === "status") {
+                $("#status-options").show();
+            } else if (selectedValue === "ip") {
+                $("#ip-options").show();
+            }
+            });
             $("form").submit(function (event) {
                 event.preventDefault();
                 var eventName = $("#event-name").val();
+                var groupBy = $("#group-by").val();
                 var dateFrom = new Date($("#date-from").val()).toISOString().slice(0,10);
                 var dateTo = new Date($("#date-to").val()).toISOString().slice(0,10);
                 $.ajax({
@@ -83,26 +100,34 @@
                     data: {
                         event_name: eventName,
                         date_from: dateFrom,
-                        date_to: dateTo
+                        date_to: dateTo,
+                        group_by: groupBy
                     },
                     dataType: "json",
                     success: function (data) {
                         console.log(1112, data[0])
-                        $("#event-table tbody").empty();
-                        $.each(data[0].events, function (i, item) {
-                            var row = "<tr><td>" + item.event + "</td><td>" + item.count + "</td></tr>";
+                        if (groupBy === 'event') {
+                            $("#event-table tbody").empty();
+                            var row = "<tr><td>" + eventName + "</td><td>" + data[0].count + "</td></tr>";
                             $("#event-table tbody").append(row);
-                        });
-                        $("#ip-table tbody").empty();
-                        $.each(data[0].ips, function (i, item) {
-                            var row = "<tr><td>" + item.ip + "</td><td>" + item.count + "</td></tr>";
+                            $("#event-table").show();
+                            $("#ip-table").hide();
+                            $("#status-table").hide();
+                        } else if (groupBy === 'ip') {
+                            $("#ip-table tbody").empty();
+                            var row = "<tr><td>" + data[0].ip + "</td><td>" + data[0].count + "</td></tr>";
                             $("#ip-table tbody").append(row);
-                        });
-                        $("#status-table tbody").empty();
-                        $.each(data[0].statuses, function (i, item) {
-                            var row = "<tr><td>" + item.status + "</td><td>" + item.count + "</td></tr>";
+                            $("#ip-table").show();
+                            $("#event-table").hide();
+                            $("#status-table").hide();
+                        } else if (groupBy === 'status') {
+                            $("#status-table tbody").empty();
+                            var row = "<tr><td>" + data[0].status + "</td><td>" + data[0].count + "</td></tr>";
                             $("#status-table tbody").append(row);
-                        });
+                            $("#status-table").show();
+                            $("#event-table").hide();
+                            $("#ip-table").hide();
+                        }
                     },
                     error: function () {
                         alert("An error occurred while processing your request.");
@@ -113,62 +138,108 @@
     </script>
 </head>
 <body>
-    <div style="background-color: #5181b8; color: #fff; padding: 20px;">
-    <button onclick="goToIndex()">Главная</button>
-    <script>
-      function goToIndex() {
-        window.location.href = "http://localhost/vk_test/index.html";
-      }
-    </script>
-    <h1>Statistics Page</h1>
-    <form>
-        <label for="event-name">Event Name:</label>
-        <input type="text" id="event-name" name="event_name">
-        <br>
-        <label for="date-from">Date From:</label>
-        <input type="datetime-local" id="date-from" name="date_from">
-        <br>
-        <label for="date-to">Date To:</label>
-        <input type="datetime-local" id="date-to" name="date_to">
-        <br>
-        <button type="submit">Get Statistics</button>
-    </form>
-    <h2>Event Statistics</h2>
-    <table id="event-table">
-        <thead>
-        <tr>
-            <th>Event Name</th>
-            <th>Count</th>
-        </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-    <h2>IP Statistics</h2>
-    <table id="ip-table">
-        <thead>
-        <tr>
-            <th>IP Address</th>
-            <th>Count</th>
-        </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-    <h2>Status Statistics</h2>
-    <table id="status-table">
-        <thead>
-        <tr>
-            <th>User Status</th>
-            <th>Count</th>
-        </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-    <button onclick="goToSaveEvent()">Перейти на старницу ввода данных</button>
-    <script>
-      function goToSaveEvent() {
-        window.location.href = "http://localhost/vk_test/saveevent.html";
-      }
-    </script>
+    <div style="margin: 20px">
+        <div style="margin-bottom: 20px; margin-top: 20px;">
+            <div style="display: flex; justify-content: center; gap: 20px;">
+                <button type="submit" onclick="goToIndex()">Main</button>
+                <script>
+                    function goToIndex() {
+                        window.location.href = "http://localhost/vk_test/index.html";
+                    }
+                </script>
+                <button type="submit" onclick="goToSaveEvent()">Go to data entry page</button>
+                <script>
+                    function goToSaveEvent() {
+                    window.location.href = "http://localhost/vk_test/saveevent.html";
+                    }
+                </script>
+            </div>
+        </div>
+        <div style="background-color: #5181b8; color: #fff; padding: 20px; border-radius: 10px; display: flex; gap: 10px;">
+            <div style=" flex-grow: 1;">
+                <h1>Statistics Page</h1>
+                <form>
+                    <label for="group-by">Group by:</label>
+                    <select style="width: 100%; padding: 10px; margin-bottom: 20px; font-size: 16px; border: 1px solid #dfe1e5; border-radius: 4px; box-sizing: border-box;" id="group-by" name="group_by" type="group_by" required>
+                        <option value="ip">IP</option>
+                        <option value="status">Status</option>
+                        <option value="event">Event</option>
+                    </select>
+                    <br>
+                    <div id="event-options" style="display: none;">
+                        <label for="event-name">Event name:</label>
+                        <select style="width: 100%; padding: 10px; margin-bottom: 20px; font-size: 16px; border: 1px solid #dfe1e5; border-radius: 4px; box-sizing: border-box;" id="event-name" name="event_name" type="event_name" required>
+                            <option value="click">Click</option>
+                            <option value="scroll">Scroll</option>
+                            <option value="hover">Hover</option>
+                            <option value="submit">Submit</option>
+                            <option value="load">Page load</option>
+                            <option value="resize">Window resize</option>
+                            <option value="keypress">Keypress</option>
+                            <option value="drag">Drag</option>
+                            <option value="contextmenu">Context menu</option>
+                            <option value="dblclick">Double click</option>
+                        </select>
+                        <br>
+                    </div>
+
+                    <div id="status-options" style="display: none;">
+                        <label for="status-type">Status Type:</label>
+                        <select style="width: 100%; padding: 10px; margin-bottom: 20px; font-size: 16px; border: 1px solid #dfe1e5; border-radius: 4px; box-sizing: border-box;" id="status-type" name="status_type">
+                            <option value="authorized">Authorized</option>
+                            <option value="not_authorized">Not Authorized</option>
+                        </select>
+                        <br>
+                    </div>
+
+                    <div id="ip-options" style="display: none;">
+                        <label for="user-ip">IP Address:</label>
+                        <input style="width: 100%; padding: 10px; margin-bottom: 20px; font-size: 16px; border: 1px solid #dfe1e5; border-radius: 4px; box-sizing: border-box;" type="text" id="user-ip" name="user_ip">
+                        <br>
+                    </div>
+
+                    <label for="date-from">Date From:</label>
+                    <input type="date" id="date-from" name="date_from">
+                    <br>
+                    <label for="date-to">Date To:</label>
+                    <input type="date" id="date-to" name="date_to">
+                    <br>
+                    <button type="submit">Get Statistics</button>
+                </form>
+            </div>
+            <div style=" flex-grow: 1;">
+                <h2>Event Statistics</h2>
+                <table id="event-table">
+                    <thead>
+                    <tr>
+                        <th>Event Name</th>
+                        <th>Count</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <h2>IP Statistics</h2>
+                <table id="ip-table">
+                    <thead>
+                    <tr>
+                        <th>IP Address</th>
+                        <th>Count</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <h2>Status Statistics</h2>
+                <table id="status-table">
+                    <thead>
+                    <tr>
+                        <th>User Status</th>
+                        <th>Count</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </body>
 </html>

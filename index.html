@@ -2,13 +2,12 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Статистика</title>
+    <title>Statistics</title>
     <style>
       body {
         background-color: #F2F3F5;
         font-family: Arial, sans-serif;
       }
-
       h1 {
         font-size: 36px;
         font-weight: bold;
@@ -16,11 +15,10 @@
         text-align: center;
         margin-top: 50px;
       }
-
       button {
         display: block;
         margin: 30px auto;
-        padding: 15px 20px;
+        padding: 10px 20px;
         font-size: 18px;
         font-weight: bold;
         color: #FFFFFF;
@@ -28,23 +26,21 @@
         border: none;
         border-radius: 5px;
         cursor: pointer;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       }
-
       button:hover {
-        background-color: #5F9BEA;
+        background-color: #3D6FB4;
       }
     </style>
   </head>
   <body>
-    <h1>Получи статистику!</h1>
-    <button onclick="goToGetForm()">Получить данные</button>
+    <h1>Get the statistics!</h1>
+    <button onclick="goToGetForm()">Get data</button>
     <script>
       function goToGetForm() {
         window.location.href = "http://localhost/vk_test/getevent.html";
       }
     </script>
-    <button onclick="goToPostForm()">Передать данные</button>
+    <button onclick="goToPostForm()">Send data</button>
     <script>
       function goToPostForm() {
         window.location.href = "http://localhost/vk_test/saveevent.html";

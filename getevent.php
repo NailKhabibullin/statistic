@@ -39,6 +39,14 @@ function getStats($pdo, $eventName, $dateFrom, $dateTo, $groupBy = 'event') {
     echo json_encode($result);
 }
 
+function getAllStats($pdo) {
+    $query = "SELECT * FROM events";
+    $stmt = $pdo->query($query);
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    http_response_code(200);
+    echo json_encode($result);
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     if (isset($_GET['event_name']) && isset($_GET['date_from']) && isset($_GET['date_to'])) {
         $eventName = $_GET['event_name'];
@@ -46,6 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         $dateTo = $_GET['date_to'];
         $groupBy = isset($_GET['group_by']) ? $_GET['group_by'] : 'event';
         getStats($pdo, $eventName, $dateFrom, $dateTo, $groupBy);
+    } elseif (isset($_GET['all_stats'])) {
+        getAllStats($pdo);
     } else {
         http_response_code(400);
         echo 'Bad request';

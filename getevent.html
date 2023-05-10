@@ -70,12 +70,37 @@
             border-bottom: 1px solid #dfe1e5;
         }
         table th {
-            font-weight: 500;
+            font-weight: bold;
             font-size: 18px;
         }
     </style>
     <script>
+        getAllStats();
+
+        function getAllStats() {
+                $.ajax({
+                    url: "getevent.php",
+                    method: "GET",
+                    data: {
+                        all_stats: true
+                    },
+                    dataType: "json",
+                    success: function (data) {
+                        console.log(2222, data);
+                        $("#stats-table tbody").empty();
+                        for (var i = 0; i < data.length; i++) {
+                            var row = "<tr><td>" + data[i].id + "</td><td>" + data[i].event_name + "</td><td>" + data[i].user_status + "</td><td>" + data[i].user_ip  + "</td><td>" + data[i].event_date + "</td></tr>";
+                            $("#stats-table tbody").append(row);
+                        }
+                    },
+                    error: function () {
+                        alert("An error occurred while processing your request.");
+                    }
+                });
+            }
+
         $(document).ready(function () {
+            
             $("#group-by").change(function () {
             var selectedValue = $(this).val();
             $("#event-options, #status-options, #ip-options").hide();
@@ -105,7 +130,6 @@
                     },
                     dataType: "json",
                     success: function (data) {
-                        console.log(1112, data[0])
                         if (groupBy === 'event') {
                             $("#event-table tbody").empty();
                             var row = "<tr><td>" + eventName + "</td><td>" + data[0].count + "</td></tr>";
@@ -240,6 +264,19 @@
                 </table>
             </div>
         </div>
+        <table id="stats-table">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Event name</th>
+                    <th>User status</th>
+                    <th>User ip</th>
+                    <th>Event date</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <!-- <button id="btn-get-all-stats">Get All Stats</button> -->
     </div>
 </body>
 </html>
